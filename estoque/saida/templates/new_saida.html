@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block product %}
+    <p>Nova saida</p>
+    <form action="{% url 'saida:new_saida' %}"method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="button is-success" type="submit">Salvar</button>
+    </form>
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li style="color:red" {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+{% endblock %}

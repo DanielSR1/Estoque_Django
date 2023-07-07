@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block product %}
+    <form action="{% url 'produto:new_produto' %}"method="POST">
+        {% csrf_token %}
+        <p>Novo produto</p>
+            {% for field in form %} 
+            <div class="field">
+                <label class="label">{{ field.label }}</label>
+                    {% if  field.name  == 'cor' %}
+                    <div class="select">
+                        {{ field }}
+                    </div>
+                    {% else %}
+                    <div class="control">
+                        {{ field }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %} 
+            <button class="button is-success" type="submit">Salvar</button>
+    </form>
+{% endblock %}
