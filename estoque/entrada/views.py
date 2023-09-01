@@ -1,0 +1,54 @@
+from django.shortcuts import render, redirect
+from .models import Entradas
+from .forms import EntradasForm
+# Create your views here.
+def list_entrada(request):
+    entradas = Entradas.objects.all()
+    template_name = 'list_entrada.html'
+    context = {
+    'entradas': entradas,
+    }
+    return render(request, template_name, context)
+
+def new_entrada(request):
+    if request.method == 'POST':
+        form = EntradasForm(request.POST)
+        if form.is_valid():
+            form.save(commit=False)
+            form.cleaned_data['produto'].quantidade = form.cleaned_data['produto'].quantidade + form.cleaned_data['quantidade']
+            form.cleaned_data['produto'].preco = form.cleaned_data['preco']
+            form.cleaned_data['produto'].save_base()
+            form.save()
+            return redirect('entrada:list_entrada')
+    else:
+        template_name = 'new_entrada.html'
+        context = {
+        'form': EntradasForm(),
+        }
+        return render(request, template_name, context)
+
+def update_entrada(request, pk):
+    entrada = Entradas.objects.get(pk=pk)
+    quantidade = entrada.quantidade
+    if request.method == 'POST':
+        form = EntradasForm(request.POST, instance=entrada)
+        if form.is_valid():
+            form.cleaned_data['produto'].quantidade = form.cleaned_data['produto'].quantidade - quantidade + form.cleaned_data['quantidade']
+            form.cleaned_data['produto'].save_base()
+            form.save()
+            return redirect('entrada:list_entrada')
+    else:
+        template_name = 'update_entrada.html'
+        context = {
+        'form': EntradasForm(instance=entrada),
+        'pk': pk,
+        }
+        return render(request, template_name, context)
+    
+def delete_entrada(request, pk):
+    entrada = Entradas.objects.get(pk=pk)
+    entrada.produto.quantidade = entrada.produto.quantidade - entrada.quantidade
+    entrada.produto.save()
+    entrada.delete()
+    
+    return redirect('entrada:list_entrada')
